@@ -52,6 +52,8 @@ var (
 	srcLinkHashFormat = flag.String("hashformat", "#L%d", "source link URL hash format")
 
 	srcLinkFormat = flag.String("srclink", "", "if set, format for entire source link")
+
+	branchName = flag.String("branch", "", "to place between repo name and file path")
 )
 
 const (
@@ -201,7 +203,11 @@ func urlFromPackage(src string) string {
 	// other packages
 	for _, pat := range gitPatterns {
 		if pat.pattern.MatchString(src) {
-			return rewriteURL(src, pat.suffix, pat.pattern)
+			suffix := *branchName
+			if len(suffix) == 0 {
+				suffix = pat.suffix
+			}
+			return rewriteURL(src, suffix, pat.pattern)
 		}
 	}
 	return fmt.Sprintf("https://golang.org/src/%s", src)
